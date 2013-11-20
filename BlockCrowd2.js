@@ -1,5 +1,3 @@
-#pragma strict
-
 //guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
@@ -36,7 +34,7 @@ public class Behaviour
 	public var level : int; // higher level has higher priority
 	public var motors : Array; // function pointers	
 	
-	public function Add_motor(motor : function) {
+	public function Add_motor(motor : Function) {
 		motors.Push(motor);
 	}
 	
@@ -174,7 +172,7 @@ function Coordination_module() {
 	// select the behaviour with highest level
 	if (behaviours.length > 0) {
 		var highest = behaviours[0].level;
-		currentBehaviour = behaviours[0]
+		currentBehaviour = behaviours[0];
 		
 		for (var behaviour in behaviours) {
 			if (behaviour.level > highest) {
@@ -188,7 +186,7 @@ function Coordination_module() {
 
 function Execution_module() {
 	for (var motor in currentBehaviour.motors)
-		motor()
+		motor();
 }
 
 //determines how many bodies are current targets
