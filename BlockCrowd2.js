@@ -31,7 +31,7 @@ var goingup = false;
 var currentTarget : Transform;
 var robot : Transform;
 
-public class Behavior
+public class Behaviour
 {
 	public var level : int; // higher level has higher priority
 	public var motors : Array; // function pointers	
@@ -40,15 +40,15 @@ public class Behavior
 		motors.Push(motor);
 	}
 	
-	public function Behavior(lv : int) {
+	public function Behaviour(lv : int) {
 		level = lv;
 	}
 }
 
-var behaviors : Array;
-var currentBehavior : Behavior;
+var behaviours : Array;
+var currentBehaviour : Behaviour;
 
-//define animation behaviors
+//define animation behaviours
 function Start() {
 	var rand = Random.value;
 	//numBodies = rand*3;
@@ -134,52 +134,52 @@ function Perceptual_module() {
 	currentTarget = closest; // could be null
 }
 
-function behavior_module() {
+function behaviour_module() {
 
 	dist = guardLine - currentTarget.transform.position.z;
 
-	behaviors = [];
+	behaviours = [];
 	
 	// watching
 	if (currentTarget == null) {
-		var new_behavior = new Behavior(0);
+		var new_behaviour = new Behavior(0);
 		// above eye-level
-		new_behavior.Add_motor(fly_at_given_altitude);
-		new_behavior.Add_motor(stabilize);	
+		new_behaviour.Add_motor(fly_at_given_altitude);
+		new_behaviour.Add_motor(stabilize);	
 		
-		behaviors.Push(new_behavior);
+		behaviours.Push(new_behaviour);
 	}
 	
 	// approaching
 	if (currentTarget != null && dist > threshold) {		
-		var new_behavior = new Behavior(1);
+		var new_behaviour = new Behavior(1);
 		// eye-level				
-		new_behaviors.Add_motor(fly_at_given_altitude);
-		new_behaviors.Add_motor(follow_x_direction);
+		new_behaviours.Add_motor(fly_at_given_altitude);
+		new_behaviours.Add_motor(follow_x_direction);
 		
-		behaviors.Push(new_behavior);
+		behaviours.Push(new_behavior);
 	}	
 	
 	// threatening
 	if (currentTarget != null && dist <= threshold) {
-		var new_behavior = new Behavior(2);
-		new_behaviors.Add_motor(random_motion_3D);
+		var new_behaviour = new Behavior(2);
+		new_behaviours.Add_motor(random_motion_3D);
 		
-		behaviors.Push(new_behavior);
+		behaviours.Push(new_behavior);
 	}
 }
 
 function Coordination_module() {
 	
-	// select the behavior with highest level
-	if (behaviors.length > 0) {
-		var highest = behaviors[0].level;
-		currentBehavior = behaviors[0]
+	// select the behaviour with highest level
+	if (behaviours.length > 0) {
+		var highest = behaviours[0].level;
+		currentBehaviour = behaviours[0]
 		
-		for (var behavior in behaviors) {
-			if (behavior.level > highest) {
-				currentBehavior = behavior;
-				highest = behavior.level;
+		for (var behaviour in behaviours) {
+			if (behaviour.level > highest) {
+				currentBehaviour = behaviour;
+				highest = behaviour.level;
 			}
 		}
 	}
@@ -187,7 +187,7 @@ function Coordination_module() {
 }
 
 function Execution_module() {
-	for (var motor in currentBehavior.motors)
+	for (var motor in currentBehaviour.motors)
 		motor()
 }
 
