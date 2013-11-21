@@ -1,3 +1,6 @@
+// Han, it can run now, but I didn't see the UAV moving, maybe because of parameter settings. 
+// I think you can figure it out.
+
 //guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
