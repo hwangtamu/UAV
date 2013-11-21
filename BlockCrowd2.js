@@ -1,7 +1,7 @@
 // Han, it can run now, but I didn't see the UAV moving. I found errors occurs in line 40: motors.Push(motor);
 // I guess it's because I didn't initialize motors Array. Gotta have the seminar.
 // I think you can figure it out.
-
+// 6:14 PM Nov. 20
 //guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
