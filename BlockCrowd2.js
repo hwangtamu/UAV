@@ -1,4 +1,5 @@
-// Han, it can run now, but I didn't see the UAV moving, maybe because of parameter settings. 
+// Han, it can run now, but I didn't see the UAV moving. I found errors occurs in line 40: motors.Push(motor);
+// I guess it's because I didn't initialize motors Array. Gotta have the seminar.
 // I think you can figure it out.
 
 //guard line definition
