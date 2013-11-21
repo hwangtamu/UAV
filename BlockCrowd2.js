@@ -11,7 +11,6 @@ private var spin : AnimationState;
 //var builtin : Transform[];
 var bodies : Array;
 var targets : Array;
-var numBodies = 3.0;
 
 // guardLine
 var guardLine = ZUpperBound;
@@ -62,20 +61,28 @@ function Start() {
 	spin.wrapMode = WrapMode.Loop;
 	spin.speed = 2.0;
 	
-	bodies = new Array();
-	bodies.Add(GameObject.Find("/Red"));
+	//bodies = new Array();
+	/*for (var obj in GameObject){
+	    Debug.Log(obj.ToString);
+	}*/
+	/*bodies.Add(GameObject.Find("/Red"));
 	bodies.Add(GameObject.Find("/Yellow"));
-	bodies.Add(GameObject.Find("/Blue"));
-	targets = new Array(bodies);	
+	bodies.Add(GameObject.Find("/Blue"));*/
+	//bodies = GameObject.FindGameObjectsWithTag("Respawn");
+	//targets = new Array(bodies);	
 	
-	targetsAboveLine = new Array ();
-	currentTarget = targets[0].transform;
+	//targetsAboveLine = new Array ();
+	//currentTarget = targets[0].transform;
 	
-	dist = guardLine - currentTarget.transform.position.z;
+	//dist = guardLine - currentTarget.transform.position.z;
 }
 
 
 function Update () {
+    bodies = new Array();
+    bodies = GameObject.FindGameObjectsWithTag("Respawn");
+	targets = new Array(bodies);	
+	
 	animation.CrossFade("Spin");	
 	
 	// get raw data
