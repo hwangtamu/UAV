@@ -42,3 +42,12 @@ Boo.Lang.Runtime.RuntimeServices.GetDispatcher (System.Object target, System.Obj
 Boo.Lang.Runtime.RuntimeServices.SetProperty (System.Object target, System.String name, System.Object value)
 BlockCrowd2.Behaviour_module () (at Assets/BlockCrowd2.js:181)
 BlockCrowd2.Update () (at Assets/BlockCrowd2.js:98)
+
+
+//10:16
+
+ArgumentNullException: Argument cannot be null.
+Parameter name: target
+Boo.Lang.Runtime.RuntimeServices.InvokeCallable (System.Object target, System.Object[] args)
+BlockCrowd2.Execution_module () (at Assets/BlockCrowd2.js:212)
+BlockCrowd2.Update () (at Assets/BlockCrowd2.js:105)
