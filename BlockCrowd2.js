@@ -22,14 +22,14 @@ var dist = 0.0;
 // movement variables
 var movement = Vector3.zero;
 var moveSpeed = 2.0;
-var followDistance = 0.6;
+var followDistance = 0.2;
 var keepAliveSpeed = .01;
 var goingup = false;
 
 var currentTarget : Transform;
 var robot : Transform;
 
-var threshold = 5;
+var threshold = 0.4;
 
 public class Behaviour
 {
@@ -136,6 +136,7 @@ function Perceptual_module() {
 function Behaviour_module() {
 
 	dist = guardLine - currentTarget.transform.position.z;
+	//Debug.Log("dist: " + dist);
 
 	behaviours = [];
 	
@@ -212,6 +213,7 @@ function follow_x_direction() {
 		movement.x = 0.0;
 	}
 	
+	//Debug.Log(movement.x);
 	transform.Translate(movement.x, 0, 0, currentTarget.transform);	
 }
 
@@ -245,11 +247,29 @@ function fly_at_given_altitude() {
 function random_move_3D() {
 	Debug.Log("random_move_3D");
 	// random pick directional vector
+	var random_vector: Vector3 = Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1));
+	var move : Vector3;
+	mov = moveSpeed * random_vector.normalized;
+	var dest : Transform;
+	dest.position = transform.position + move;
 	
+	if (dest.position.z > ZUpperBound)
+		dest.position.z = ZUpperBound;
+	if (dest.position.z < ZLowerBound)
+		dest.position.z = ZLowerBound;
+	if (dest.position.y > YUpperBound)
+		dest.position.y = YUpperBound;
+	if (dest.position.y < YLowerBound)
+		dest.position.y = YLowerBound;
+		
+	if (dest.position.x > currentTarget.position.x + followDistance)
+		dest.position.x = currentTarget.position.x + followDistance;	
+	if (dest.position.x < currentTarget.position.x - followDistance)
+		dest.position.x = currentTarget.position.x - followDistance;
 }
 
 //this resets the robot's tilt and height to normal
 function stabilize() {
 	Debug.Log("stabilize");
-	transform.eulerAngles = Vector3(0, 0, 0);
+	transform.eulerAngles = Vector3(0, 0, 0);	
 }
