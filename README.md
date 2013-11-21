@@ -5,7 +5,7 @@ csce635
 
 Error Log
 
-//6:36 PM Nov. 20 BlockCrowd2.js
+//6:36 PM Nov. 20 BlockCrowd2.js 
 
 
 NullReferenceException: Object reference not set to an instance of an object
