@@ -29,6 +29,8 @@ var goingup = false;
 var currentTarget : Transform;
 var robot : Transform;
 
+var threshold = 5;
+
 public class Behaviour
 {
 	public var level : int; // higher level has higher priority
@@ -83,7 +85,7 @@ function Update () {
 	Perceptual_module();
 	
 	// 
-	Behavior_module();
+	Behaviour_module();
 	
 	// 
 	Coordination_module();
@@ -99,7 +101,7 @@ function Sensor_module() {
 
 // get position of robot relative to Hokuyo
 function Hokuyo() {	
-	robot = tranform;
+	robot = transform;
 }
 
 // get position of crowds from robot on-board camera relative to the robot
@@ -132,7 +134,7 @@ function Perceptual_module() {
 	currentTarget = closest; // could be null
 }
 
-function behaviour_module() {
+function Behaviour_module() {
 
 	dist = guardLine - currentTarget.transform.position.z;
 
@@ -140,7 +142,7 @@ function behaviour_module() {
 	
 	// watching
 	if (currentTarget == null) {
-		var new_behaviour = new Behavior(0);
+		var new_behaviour = new Behaviour(0);
 		// above eye-level
 		new_behaviour.Add_motor(fly_at_given_altitude);
 		new_behaviour.Add_motor(stabilize);	
@@ -150,20 +152,20 @@ function behaviour_module() {
 	
 	// approaching
 	if (currentTarget != null && dist > threshold) {		
-		var new_behaviour = new Behavior(1);
+		new_behaviour = new Behaviour(1);
 		// eye-level				
-		new_behaviours.Add_motor(fly_at_given_altitude);
-		new_behaviours.Add_motor(follow_x_direction);
+		new_behaviour.Add_motor(fly_at_given_altitude);
+		new_behaviour.Add_motor(follow_x_direction);
 		
-		behaviours.Push(new_behavior);
+		behaviours.Push(new_behaviour);
 	}	
 	
 	// threatening
 	if (currentTarget != null && dist <= threshold) {
-		var new_behaviour = new Behavior(2);
-		new_behaviours.Add_motor(random_motion_3D);
+		new_behaviour = new Behaviour(2);
+		new_behaviour.Add_motor(random_move_3D);
 		
-		behaviours.Push(new_behavior);
+		behaviours.Push(new_behaviour);
 	}
 }
 
@@ -187,20 +189,6 @@ function Coordination_module() {
 function Execution_module() {
 	for (var motor in currentBehaviour.motors)
 		motor();
-}
-
-//determines how many bodies are current targets
-function findTargets() {
-	var newTargets = new Array ();
-	var newTargetsAboveLine = new Array ();
-	
-	for (var body in bodies) {
-		if(body.transform.position.z < guardLine && body.transform.position.z > social) {
-			newTargets.Push(body);
-		}
-	}
-	
-	targets = newTargets;
 }
 
 // motor schemas
