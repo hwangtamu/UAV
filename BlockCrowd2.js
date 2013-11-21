@@ -1,7 +1,3 @@
-// Han, it can run now, but I didn't see the UAV moving. I found errors occurs in line 40: motors.Push(motor);
-// I guess it's because I didn't initialize motors Array. Gotta have the seminar.
-// I think you can figure it out.
-// 6:14 PM Nov. 20
 //guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
@@ -46,6 +42,7 @@ public class Behaviour
 	
 	public function Behaviour(lv : int) {
 		level = lv;
+		motors = new Array();
 	}
 }
 
@@ -78,9 +75,7 @@ function Start() {
 
 
 function Update () {
-	animation.CrossFade("Spin");
-	
-	//updateState();
+	animation.CrossFade("Spin");	
 	
 	// get raw data
 	Sensor_module();	
@@ -190,13 +185,17 @@ function Coordination_module() {
 	
 }
 
-function Execution_module() {
-	for (var motor in currentBehaviour.motors)
+function Execution_module() {	
+	for (var motor in currentBehaviour.motors) {
 		motor();
+		Debug.Log("motor");
+	}
 }
 
 // motor schemas
 function follow_x_direction() {
+
+	Debug.Log("follow_x_direction");
 	var tx = currentTarget.position.x;	
 	var myx = transform.position.x;
 	
@@ -217,6 +216,7 @@ function follow_x_direction() {
 }
 
 function fly_at_given_altitude() {
+	Debug.Log("fly_at_given_altitude");
 	// above the range
 	if (transform.position.y > YUpperBound){
 		transform.Translate(0,-keepAliveSpeed,0);
@@ -243,11 +243,13 @@ function fly_at_given_altitude() {
 }
 
 function random_move_3D() {
+	Debug.Log("random_move_3D");
 	// random pick directional vector
 	
 }
 
 //this resets the robot's tilt and height to normal
 function stabilize() {
+	Debug.Log("stabilize");
 	transform.eulerAngles = Vector3(0, 0, 0);
 }
