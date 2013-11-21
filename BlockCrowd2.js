@@ -23,13 +23,14 @@ var dist = 0.0;
 var movement = Vector3.zero;
 var moveSpeed = 2.0;
 var followDistance = 0.2;
-var keepAliveSpeed = .01;
+var keepAliveSpeed = 0.01;
 var goingup = false;
 
 var currentTarget : Transform;
 var robot : Transform;
 
-var threshold = 0.4;
+var approachLine = 4;
+var threatenLine = 1;
 
 public class Behaviour
 {
@@ -141,7 +142,7 @@ function Behaviour_module() {
 	behaviours = [];
 	
 	// watching
-	if (currentTarget == null) {
+	if (currentTarget == null || approachLine < dist) {
 		var new_behaviour = new Behaviour(0);
 		// above eye-level
 		new_behaviour.Add_motor(fly_at_given_altitude);
@@ -151,7 +152,7 @@ function Behaviour_module() {
 	}
 	
 	// approaching
-	if (currentTarget != null && dist > threshold) {		
+	if (currentTarget != null && threatenLine < dist && dist <= approachLine) {		
 		new_behaviour = new Behaviour(1);
 		// eye-level				
 		new_behaviour.Add_motor(fly_at_given_altitude);
@@ -161,7 +162,7 @@ function Behaviour_module() {
 	}	
 	
 	// threatening
-	if (currentTarget != null && dist <= threshold) {
+	if (currentTarget != null && dist <= threatenLine) {
 		new_behaviour = new Behaviour(2);
 		new_behaviour.Add_motor(random_move_3D);
 		
@@ -221,16 +222,16 @@ function fly_at_given_altitude() {
 	Debug.Log("fly_at_given_altitude");
 	// above the range
 	if (transform.position.y > YUpperBound){
-		transform.Translate(0,-keepAliveSpeed,0);
+		transform.Translate(0, -keepAliveSpeed, 0);
 		goingup = false;
 	}
 	// below the range
 	if (transform.position.y < YLowerBound){
-		transform.Translate(0,keepAliveSpeed,0);
+		transform.Translate(0, keepAliveSpeed, 0);
 		goingup = true;
 	}
 	// in the range
-	if (transform.position.y < YUpperBound && transform.position.y > YLowerBound){
+	if (YLowerBound <= transform.position.y && transform.position.y <= YUpperBound){
 		if(goingup){
 			transform.Translate(0, keepAliveSpeed, 0);
 			if(transform.position.y >= YUpperBound)
@@ -249,23 +250,28 @@ function random_move_3D() {
 	// random pick directional vector
 	var random_vector: Vector3 = Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1));
 	var move : Vector3;
-	mov = moveSpeed * random_vector.normalized;
-	var dest : Transform;
-	dest.position = transform.position + move;
+	move = 0.1 * random_vector.normalized;
+	//Debug.Log("move y" + move.y);
 	
-	if (dest.position.z > ZUpperBound)
-		dest.position.z = ZUpperBound;
-	if (dest.position.z < ZLowerBound)
-		dest.position.z = ZLowerBound;
-	if (dest.position.y > YUpperBound)
-		dest.position.y = YUpperBound;
-	if (dest.position.y < YLowerBound)
-		dest.position.y = YLowerBound;
+	var dest : Vector3;
+	dest = transform.position + move;	
+	
+	if (dest.z > ZUpperBound)
+		dest.z = transform.position.z - keepAliveSpeed;
+	if (dest.z < ZLowerBound)
+		dest.z = transform.position.z + keepAliveSpeed;
 		
-	if (dest.position.x > currentTarget.position.x + followDistance)
-		dest.position.x = currentTarget.position.x + followDistance;	
-	if (dest.position.x < currentTarget.position.x - followDistance)
-		dest.position.x = currentTarget.position.x - followDistance;
+	if (dest.y > YUpperBound)
+		dest.y = transform.position.y - keepAliveSpeed;
+	if (dest.y < YLowerBound)
+		dest.y = transform.position.y + keepAliveSpeed;		
+		
+	if (dest.x > currentTarget.position.x + followDistance)
+		dest.x = transform.position.x - keepAliveSpeed;	
+	if (dest.x < currentTarget.position.x - followDistance)
+		dest.x = transform.position.x + keepAliveSpeed;
+		
+	transform.Translate(dest - transform.position);
 }
 
 //this resets the robot's tilt and height to normal
