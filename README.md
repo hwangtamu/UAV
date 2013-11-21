@@ -22,7 +22,8 @@ Boo.Lang.Runtime.DynamicDispatching.PropertyDispatcherFactory.CreateSetter ()
 Boo.Lang.Runtime.RuntimeServices.DoCreatePropSetDispatcher (System.Object target, System.Type type, System.String name, System.Object value)
 
 
-/8:46 PM Nov.20
+//8:46 PM Nov.20
+
 MissingFieldException: Boo.Lang.Hash.fly_at_given_altitude
 Boo.Lang.Runtime.DynamicDispatching.PropertyDispatcherFactory.FindExtension (IEnumerable`1 candidates)
 Boo.Lang.Runtime.DynamicDispatching.PropertyDispatcherFactory.Create (SetOrGet gos)
