@@ -1,7 +1,7 @@
 // Han, it can run now, but I didn't see the UAV moving. I found errors occurs in line 40: motors.Push(motor);
 // I guess it's because I didn't initialize motors Array. Gotta have the seminar.
 // I think you can figure it out.
-// 8:46 PM Nov. 20
+// 9:10 PM Nov. 20
 //guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
@@ -58,6 +58,7 @@ var currentBehaviour : Behaviour;
 
 //define animation behaviours
 function Start() {
+    Debug.Log("Start--");
 	var rand = Random.value;
 	//numBodies = rand*3;
 	numBodies = 3;
@@ -78,6 +79,7 @@ function Start() {
 	currentTarget = targets[0].transform;
 	
 	dist = guardLine - currentTarget.transform.position.z;
+	Debug.Log("--Start");
 }
 
 
@@ -91,7 +93,7 @@ function Update () {
 	
 	// process raw data
 	Perceptual_module();
-	
+	Debug.Log("--Perceptual_module");
 	// 
 	Behaviour_module();
 	
@@ -150,30 +152,36 @@ function Behaviour_module() {
 	
 	// watching
 	if (currentTarget == null) {
+	    Debug.Log("Behavior 0");
 		var new_behaviour = new Behaviour(0);
 		// above eye-level
 		new_behaviour.motors.fly_at_given_altitude=fly_at_given_altitude;
 		new_behaviour.motors.stabilize=stabilize;	
 		
 		behaviours.Push(new_behaviour);
+		Debug.Log(new_behaviour.level);
 	}
 	
 	// approaching
-	if (currentTarget != null && dist > threshold) {		
+	if (currentTarget != null && dist > threshold) {
+	    Debug.Log("Behavior 1");		
 		new_behaviour = new Behaviour(1);
 		// eye-level				
 		new_behaviour.motors.fly_at_given_altitude=fly_at_given_altitude;
 		new_behaviour.motors.follow_x_direction=follow_x_direction;
 		
 		behaviours.Push(new_behaviour);
+		Debug.Log(new_behaviour.level);
 	}	
 	
 	// threatening
 	if (currentTarget != null && dist <= threshold) {
+	    Debug.Log("Behavior 2");
 		new_behaviour = new Behaviour(2);
 		new_behaviour.motors.random_move_3D=random_move_3D;
 		
 		behaviours.Push(new_behaviour);
+		Debug.Log(new_behaviour.level);
 	}
 }
 
@@ -200,7 +208,7 @@ function Execution_module() {
 }
 
 // motor schemas
-function follow_x_direction() {
+function follow_x_direction() {/*
 	var tx = currentTarget.position.x;	
 	var myx = transform.position.x;
 	
@@ -217,10 +225,10 @@ function follow_x_direction() {
 		movement.x = 0.0;
 	}
 	
-	transform.Translate(movement.x, 0, 0, currentTarget.transform);	
+	transform.Translate(movement.x, 0, 0, currentTarget.transform);	*/
 }
 
-function fly_at_given_altitude() {
+function fly_at_given_altitude() {/*
 	// above the range
 	if (transform.position.y > YUpperBound){
 		transform.Translate(0,-keepAliveSpeed,0);
@@ -243,7 +251,7 @@ function fly_at_given_altitude() {
 			if(transform.position.y <= YLowerBound)
 				goingup = true;
 		}
-	}
+	}*/
 }
 
 function random_move_3D() {
