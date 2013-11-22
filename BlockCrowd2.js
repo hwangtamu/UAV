@@ -1,16 +1,21 @@
-//guard line definition
+// const
+var inf = 1e10;
+
+// guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
+var XUpperBound = 4;
+var XLowerBound = -4;
 
-//animation variables
+// animation variables
 private var spin : AnimationState;
 
-//target variables
-//var builtin : Transform[];
+// target variables
 var bodies : Array;
 var targets : Array;
+var currentTarget : Transform;
 
 // guardLine
 var guardLine = ZUpperBound;
@@ -22,19 +27,28 @@ var dist = 0.0;
 var movement = Vector3.zero;
 var moveSpeed = 2.0;
 var followDistance = 0.2;
-var keepAliveSpeed = 0.01;
+var verticalSpeed = 0.01;
 var goingup = false;
 
-var currentTarget : Transform;
+// hokuyo variable
 var robot : Transform;
 
+// proximity variables
 var approachLine = 4;
 var threatenLine = 1;
+
+// behaviour variables
+var behaviours : Array;
+var currentBehaviour : Behaviour;
 
 public class Behaviour
 {
 	public var level : int; // higher level has higher priority
 	public var motors : Array; // function pointers	
+	public var YUpperBound : float;
+	public var YLowerBound : float;
+	public var moveSpeed : float;
+	public var verticalSpeed : float;
 	
 	public function Add_motor(motor : Function) {
 		motors.Push(motor);
@@ -46,10 +60,7 @@ public class Behaviour
 	}
 }
 
-var behaviours : Array;
-var currentBehaviour : Behaviour;
-
-//define animation behaviours
+// define animation behaviours
 function Start() {
 	var rand = Random.value;
 	//numBodies = rand*3;
@@ -59,51 +70,33 @@ function Start() {
 	spin.layer = 1;
 	spin.blendMode = AnimationBlendMode.Additive;
 	spin.wrapMode = WrapMode.Loop;
-	spin.speed = 2.0;
-	
-	//bodies = new Array();
-	/*for (var obj in GameObject){
-	    Debug.Log(obj.ToString);
-	}*/
-	/*bodies.Add(GameObject.Find("/Red"));
-	bodies.Add(GameObject.Find("/Yellow"));
-	bodies.Add(GameObject.Find("/Blue"));*/
-	//bodies = GameObject.FindGameObjectsWithTag("Respawn");
-	//targets = new Array(bodies);	
-	
-	//targetsAboveLine = new Array ();
-	//currentTarget = targets[0].transform;
-	
-	//dist = guardLine - currentTarget.transform.position.z;
+	spin.speed = 2.0;	
 }
 
-
+// called for each new frame Unity draws
 function Update () {
-	bodies = new Array();
-	bodies = GameObject.FindGameObjectsWithTag("Respawn");
+    bodies = new Array();
+    bodies = GameObject.FindGameObjectsWithTag("Respawn");
 	targets = new Array(bodies);	
 	
 	animation.CrossFade("Spin");	
-	
-	// get raw data
+
+	// go through five stages
 	Sensor_module();	
-	
-	// process raw data
+		
 	Perceptual_module();
-	
-	// 
+		
 	Behaviour_module();
-	
-	// 
+		
 	Coordination_module();
-	
-	//
+		
 	Execution_module();
 }
 
+// get raw data from sensors
 function Sensor_module() {
 	Hokuyo();
-	Camera();
+	robotCamera();
 }
 
 // get position of robot relative to Hokuyo
@@ -112,7 +105,7 @@ function Hokuyo() {
 }
 
 // get position of crowds from robot on-board camera relative to the robot
-function Camera() {
+function robotCamera() {
 	var newTargets = new Array ();
 	var newTargetsAboveLine = new Array ();
 	
@@ -125,26 +118,34 @@ function Camera() {
 
 // find the closest target
 function Perceptual_module() {
-	if (targets.length > 0) {
-		var closest = targets[0].transform;
-		var pos = targets[0].transform.position.z;
-	
-		//determine closest z-value
-		for (var body in targets) {
-			if (body.transform.position.z > pos) {
-				pos = body.transform.position.z;
-				closest = body.transform;
-			}	
+		
+	var closest;
+	var pos = inf;
+
+	//determine closest z-value
+	for (var body in targets) {
+		var tx = body.transform.position.x;
+		var tz = body.transform.position.z;
+		var mx = transform.position.x;
+		var mz = transform.position.z;
+		var currenSqrLen = (mx - tx) * (mx - tx) * 0 + (mz - tz) * (mz - tz) * 2;
+		if (body.transform.position.z < guardLine && currenSqrLen < pos) {
+			pos = currenSqrLen;
+			closest = body.transform;
 		}
-	}	
+	}
 	
 	currentTarget = closest; // could be null
 }
 
+// Active behaviours when their corresponding perceptual schema is perceived. 
+// there are possibly three behaviours: watching, approaching and threatening.
 function Behaviour_module() {
 
-	dist = guardLine - currentTarget.transform.position.z;
-	//Debug.Log("dist: " + dist);
+	if (currentTarget != null)
+		dist = guardLine - currentTarget.transform.position.z;
+	else
+		Debug.Log("Target not found");
 
 	behaviours = [];
 	
@@ -154,6 +155,10 @@ function Behaviour_module() {
 		// above eye-level
 		new_behaviour.Add_motor(fly_at_given_altitude);
 		new_behaviour.Add_motor(stabilize);	
+		new_behaviour.YUpperBound = 1.0;
+		new_behaviour.YLowerBound = 0.9;
+		new_behaviour.moveSpeed = 0.0;
+		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
 	}
@@ -164,6 +169,10 @@ function Behaviour_module() {
 		// eye-level				
 		new_behaviour.Add_motor(fly_at_given_altitude);
 		new_behaviour.Add_motor(follow_x_direction);
+		new_behaviour.YUpperBound = 0.6;
+		new_behaviour.YLowerBound = 0.5;
+		new_behaviour.moveSpeed = 2.0;
+		new_behaviour.verticalSpeed = 0.02;
 		
 		behaviours.Push(new_behaviour);
 	}	
@@ -172,11 +181,16 @@ function Behaviour_module() {
 	if (currentTarget != null && dist <= threatenLine) {
 		new_behaviour = new Behaviour(2);
 		new_behaviour.Add_motor(random_move_3D);
+		new_behaviour.YUpperBound = 0.4;
+		new_behaviour.YLowerBound = 0.3;
+		new_behaviour.moveSpeed = 0.1;
+		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
 	}
 }
 
+// coordinate multiple behaviours
 function Coordination_module() {
 	
 	// select the behaviour with highest level
@@ -194,10 +208,16 @@ function Coordination_module() {
 	
 }
 
+// execute the overall behaviours
 function Execution_module() {	
+	YUpperBound = currentBehaviour.YUpperBound;
+	YLowerBound = currentBehaviour.YLowerBound;
+	moveSpeed = currentBehaviour.moveSpeed;
+	verticalSpeed = currentBehaviour.verticalSpeed;
+	
 	for (var motor in currentBehaviour.motors) {
 		motor();
-		Debug.Log("motor");
+		//Debug.Log("motor");
 	}
 }
 
@@ -225,63 +245,68 @@ function follow_x_direction() {
 	transform.Translate(movement.x, 0, 0, currentTarget.transform);	
 }
 
+// going up and down to be within a altitude range
 function fly_at_given_altitude() {
 	Debug.Log("fly_at_given_altitude");
 	// above the range
 	if (transform.position.y > YUpperBound){
-		transform.Translate(0, -keepAliveSpeed, 0);
+		transform.Translate(0, -verticalSpeed, 0);
 		goingup = false;
 	}
 	// below the range
 	if (transform.position.y < YLowerBound){
-		transform.Translate(0, keepAliveSpeed, 0);
+		transform.Translate(0, verticalSpeed, 0);
 		goingup = true;
 	}
 	// in the range
 	if (YLowerBound <= transform.position.y && transform.position.y <= YUpperBound){
 		if(goingup){
-			transform.Translate(0, keepAliveSpeed, 0);
+			transform.Translate(0, verticalSpeed, 0);
 			if(transform.position.y >= YUpperBound)
 				goingup = false;
 		}
 		if(!goingup){
-			transform.Translate(0, -keepAliveSpeed, 0);
+			transform.Translate(0, -verticalSpeed, 0);
 			if(transform.position.y <= YLowerBound)
 				goingup = true;
 		}
 	}
 }
 
+// move randomly in three dimensions
 function random_move_3D() {
 	Debug.Log("random_move_3D");
 	// random pick directional vector
-	var random_vector: Vector3 = Vector3(Random.Range(-1, 1), Random.Range(-1, 1), Random.Range(-1, 1));
+	var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
 	var move : Vector3;
-	move = 0.1 * random_vector.normalized;
-	//Debug.Log("move y" + move.y);
+	move = moveSpeed * random_vector.normalized;
+	//Debug.Log("move x1: " + move.x);
 	
 	var dest : Vector3;
 	dest = transform.position + move;	
 	
 	if (dest.z > ZUpperBound)
-		dest.z = transform.position.z - keepAliveSpeed;
+		dest.z = transform.position.z - verticalSpeed;
 	if (dest.z < ZLowerBound)
-		dest.z = transform.position.z + keepAliveSpeed;
+		dest.z = transform.position.z + verticalSpeed;
 		
 	if (dest.y > YUpperBound)
-		dest.y = transform.position.y - keepAliveSpeed;
+		dest.y = transform.position.y - verticalSpeed;
 	if (dest.y < YLowerBound)
-		dest.y = transform.position.y + keepAliveSpeed;		
-		
-	if (dest.x > currentTarget.position.x + followDistance)
-		dest.x = transform.position.x - keepAliveSpeed;	
-	if (dest.x < currentTarget.position.x - followDistance)
-		dest.x = transform.position.x + keepAliveSpeed;
-		
+		dest.y = transform.position.y + verticalSpeed;		
+	
+	// make sure the robot does not hit the wall as well
+	if (dest.x > currentTarget.position.x + followDistance || dest.x > XUpperBound)
+		dest.x = transform.position.x - verticalSpeed;	
+	if (dest.x < currentTarget.position.x - followDistance || dest.x < XLowerBound)
+		dest.x = transform.position.x + verticalSpeed;
+	
+	//Debug.Log("move x2: " + (dest - transform.position).x);
+				
 	transform.Translate(dest - transform.position);
 }
 
-//this resets the robot's tilt and height to normal
+// reset the robot's tilt and height to normal
 function stabilize() {
 	Debug.Log("stabilize");
 	transform.eulerAngles = Vector3(0, 0, 0);	
