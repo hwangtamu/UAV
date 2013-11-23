@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+\usepackage{fullpage}
+\usepackage{graphicx}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{procedure}{Procedure}
+\newtheorem{construction}{Construction}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{claim}{Claim}
+
+\newcommand{\Rea}{{\mathbb R}}
+\newcommand{\Int}{{\mathbb Z}}
+\newcommand{\Rat}{{\mathbb Q}}
+\newcommand{\Cmp}{{\mathbb C}}
+\newcommand{\Nat}{{\mathbb N}}
+
+\setlength{\oddsidemargin}{.25in}
+\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.25in}
+\setlength{\topmargin}{-0.0in}
+\setlength{\textheight}{8.9in}
+
+\renewenvironment{proof}{\noindent{\bf Proof:} \hspace*{1mm}}{
+	\hspace*{\fill} $\Box$ }
+\newenvironment{proof_of}[1]{\noindent {\bf Proof of #1:}
+	\hspace*{1mm}}{\hspace*{\fill} $\Box$ }
+\newenvironment{proof_claim}{\begin{quotation} \noindent}{
+	\hspace*{\fill} $\diamond$ \end{quotation}}
+
+\newcommand{\handout}[6]{
+   \renewcommand{\thepage}{#1-\arabic{page}}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{
+    \hbox to 5.78in { {\bf #2} \hfill #3 }
+       \vspace{4mm}
+       \hbox to 5.78in { {\Large \hfill #4  \hfill} }
+       \vspace{2mm}
+       \hbox to 5.78in { {\it #5 \hfill #6} }
+      }
+   }
+   \end{center}
+   \vspace*{4mm}
+}
+\newcommand{\homework}[3]{\handout{#1}{CSCE 665. Advanced Networking and Security}{#2}{Homework #1}{Professor:Guofei Gu}{Student: #3}
+%\medskip {\large \noindent {\bf NOTE: } \bf The content of these notes has not been formally reviewed by the lecturer. It is recommended that they are read critically.\\}
+
+}
+
+
