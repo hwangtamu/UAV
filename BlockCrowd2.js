@@ -6,8 +6,8 @@ var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
-var XUpperBound = 4;
-var XLowerBound = -4;
+var XUpperBound = 1.5;
+var XLowerBound = -1.5;
 
 // animation variables
 private var spin : AnimationState;
@@ -24,7 +24,6 @@ var guardLine = ZUpperBound;
 var dist = 0.0;
 
 // movement variables
-var movement = Vector3.zero;
 var moveSpeed = 2.0;
 var followDistance = 0.2;
 var verticalSpeed = 0.01;
@@ -128,7 +127,7 @@ function Perceptual_module() {
 		var tz = body.transform.position.z;
 		var mx = transform.position.x;
 		var mz = transform.position.z;
-		var currenSqrLen = (mx - tx) * (mx - tx) * 0 + (mz - tz) * (mz - tz) * 2;
+		var currenSqrLen = (mx - tx) * (mx - tx) * 1 + (mz - tz) * (mz - tz) * 5;
 		if (body.transform.position.z < guardLine && currenSqrLen < pos) {
 			pos = currenSqrLen;
 			closest = body.transform;
@@ -171,7 +170,7 @@ function Behaviour_module() {
 		new_behaviour.Add_motor(follow_x_direction);
 		new_behaviour.YUpperBound = 0.6;
 		new_behaviour.YLowerBound = 0.5;
-		new_behaviour.moveSpeed = 2.0;
+		new_behaviour.moveSpeed = 4.0;
 		new_behaviour.verticalSpeed = 0.02;
 		
 		behaviours.Push(new_behaviour);
@@ -183,7 +182,7 @@ function Behaviour_module() {
 		new_behaviour.Add_motor(random_move_3D);
 		new_behaviour.YUpperBound = 0.4;
 		new_behaviour.YLowerBound = 0.3;
-		new_behaviour.moveSpeed = 0.1;
+		new_behaviour.moveSpeed = 6.0;
 		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
@@ -224,25 +223,24 @@ function Execution_module() {
 // motor schemas
 function follow_x_direction() {
 
-	Debug.Log("follow_x_direction");
-	var tx = currentTarget.position.x;	
-	var myx = transform.position.x;
+	Debug.Log("follow_x_direction");	
+		
+	//keep within follow distance (x)		
+	var dest : Vector3;
+	dest = transform.position;
 	
-	var diffx = tx - myx;
+	if (transform.position.x > currentTarget.position.x + followDistance)
+		dest.x = transform.position.x - Time.deltaTime * moveSpeed;	
+	if (transform.position.x < currentTarget.position.x - followDistance)
+		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
+		
+	if (dest.x > XUpperBound)
+		dest.x = dest.x - Time.deltaTime * moveSpeed;	
+	if (dest.x < XLowerBound)
+		dest.x = dest.x + Time.deltaTime * moveSpeed;
 	
-	//keep within follow distance (x)
-	if (diffx < -followDistance) {
-		movement.x = Time.deltaTime * -moveSpeed;
-	}
-	else if (diffx > followDistance) {
-		movement.x = Time.deltaTime * moveSpeed;
-	}
-	else  {
-		movement.x = 0.0;
-	}
-	
-	//Debug.Log(movement.x);
-	transform.Translate(movement.x, 0, 0, currentTarget.transform);	
+	//Debug.Log((dest - transform.position).x);	
+	transform.Translate(dest - transform.position);
 }
 
 // going up and down to be within a altitude range
@@ -279,27 +277,33 @@ function random_move_3D() {
 	// random pick directional vector
 	var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
 	var move : Vector3;
-	move = moveSpeed * random_vector.normalized;
+	move = Time.deltaTime * moveSpeed * random_vector.normalized;
 	//Debug.Log("move x1: " + move.x);
 	
 	var dest : Vector3;
 	dest = transform.position + move;	
 	
 	if (dest.z > ZUpperBound)
-		dest.z = transform.position.z - verticalSpeed;
+		dest.z = transform.position.z - Time.deltaTime * moveSpeed;
 	if (dest.z < ZLowerBound)
-		dest.z = transform.position.z + verticalSpeed;
+		dest.z = transform.position.z + Time.deltaTime * moveSpeed;
 		
 	if (dest.y > YUpperBound)
-		dest.y = transform.position.y - verticalSpeed;
+		dest.y = transform.position.y - Time.deltaTime * moveSpeed;
 	if (dest.y < YLowerBound)
-		dest.y = transform.position.y + verticalSpeed;		
+		dest.y = transform.position.y + Time.deltaTime * moveSpeed;		
 	
 	// make sure the robot does not hit the wall as well
-	if (dest.x > currentTarget.position.x + followDistance || dest.x > XUpperBound)
-		dest.x = transform.position.x - verticalSpeed;	
-	if (dest.x < currentTarget.position.x - followDistance || dest.x < XLowerBound)
-		dest.x = transform.position.x + verticalSpeed;
+	if (dest.x > currentTarget.position.x + followDistance)
+		dest.x = transform.position.x - Time.deltaTime * moveSpeed;	
+	if (dest.x < currentTarget.position.x - followDistance)
+		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
+	
+	// make sure the robot does not hit the wall as well	
+	if (dest.x > XUpperBound)
+		dest.x = transform.position.x - Time.deltaTime * moveSpeed;	
+	if (dest.x < XLowerBound)
+		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
 	
 	//Debug.Log("move x2: " + (dest - transform.position).x);
 				
