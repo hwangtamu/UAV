@@ -27,7 +27,7 @@ function OnGUI()
     if(showText)
     {
  
-    GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nMedium Mode: [2]\nHard Mode [3]\nStop Spawning: [space].");
+    GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space].");
  
     }
  
