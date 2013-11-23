@@ -8,6 +8,8 @@ var xMove = 0.0;
 var zMove = 0.0;
 var x_target = 0.0;
 var z_target = -5.5;
+var deviant_x = 0;
+var deviant_z = 0;
 
 //target variables
 var target;
@@ -59,7 +61,7 @@ function Update () {
 	
 	//determine distance between me and robot
 	sqrLen = (target.position - transform.position).sqrMagnitude;
-	
+	//the speed of the crowd depends on the distance between the crowd and the robot.
 	if( sqrLen < social && !goBack){
 		zMove += -.1 * Time.deltaTime * zMove;
 	}
@@ -87,8 +89,16 @@ function Update () {
 	if(transform.position.z <= 0){
 		transform.Translate(xMove, 0, zMove);
 	}
-	if(transform.position.z<-14 || transform.position.z>0||(Mathf.Abs(transform.position.x)>2.5 && Mathf.Abs(transform.position.z-5.5)<0.1)){
+	
+	//Destroy redundant gameobject automatically.
+	deviant_x = Mathf.Abs(transform.position.x);
+	deviant_z = Mathf.Abs(transform.position.z+5.5);
+	if(deviant_x >2 && deviant_z < 0.5){
 		Destroy(gameObject);
 	}
-	//Destroy(gameObject,10.0);
+	if(transform.position.z<-14 || transform.position.z>0){
+		Destroy(gameObject);
+	}
+	
+	
 }
