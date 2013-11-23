@@ -1,12 +1,16 @@
 #pragma strict
+//Dynamically generate test dataset.
 
 var crowd :GameObject;
 var spawn_position;
 var timer = 0.0;
+
+//get prefab(template)
 crowd = AssetDatabase.LoadAssetAtPath("Assets/Crowd.prefab",typeof(GameObject));
 
+//default case
 var test_case = 0;
-
+//spawn crowd randomly
 function Spawn_Crowd(){
 	var rand = Random.value;
 	var StartX = 3*rand;
@@ -17,7 +21,7 @@ function Spawn_Crowd(){
 	spawncrowd.renderer.material.color = Color(Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0));
 }
 
-
+//Game instructions
 var showText = true;
 var textArea = new Rect(0,0,Screen.width, Screen.height);
  
@@ -85,7 +89,7 @@ function Update () {
     }
 }
 
-
+//Generate a huge number of crowds.
 function Insane(){
 	for(var i=0;i<1000;i++ ){
 		timer+=Time.deltaTime;
