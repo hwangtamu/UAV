@@ -6,8 +6,12 @@ var startPos = Vector3.zero;
 var trans = 0.0;
 var xMove = 0.0;
 var zMove = 0.0;
+
+//set up a target for the crowd to reduce the chance of hitting the wall.
 var x_target = 0.0;
 var z_target = -5.5;
+
+//measure if the crowd got stuck in the corners
 var deviant_x = 0;
 var deviant_z = 0;
 
@@ -41,13 +45,17 @@ function Start(){
 	var startX = 3*rand - 2;
 	rand = Random.value;
 	var startZ = -1*rand - 10;
+	
 	startPos = new Vector3(startX, 0.33, startZ);
 	transform.position = startPos;
+	
+	//make the crowds move in various ways
 	x_target = trans*3.0;
 	var travel_route = 	Mathf.Sqrt((x_target-startX)*(x_target-startX)+(z_target-startZ)*(z_target-startZ));
 	var t = travel_route/speed;
 	xMove = (x_target-startX)*2*Time.deltaTime/t;
 	zMove = (z_target-startZ)*2*Time.deltaTime/t;
+	
 	backspeed = -zMove;
 }
 
@@ -93,6 +101,7 @@ function Update () {
 	//Destroy redundant gameobject automatically.
 	deviant_x = Mathf.Abs(transform.position.x);
 	deviant_z = Mathf.Abs(transform.position.z+5.5);
+	
 	if(deviant_x >2 && deviant_z < 0.5){
 		Destroy(gameObject);
 	}
