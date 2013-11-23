@@ -1,0 +1,128 @@
+\include{homework-template}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{enumerate}
+\usepackage{threeparttable}
+\usepackage[colorlinks,linkcolor=red,anchorcolor=blue,citecolor=green]{hyperref}
+
+\title{Evacuation UAV: Software Test Plan}
+
+\author{Yue Zhuo and Han Wang}
+
+\begin{document}\large
+
+\maketitle
+
+%header --- replace with appropriate values
+%\homework{2}{October 20, 2013}{Yue Zhuo}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ 
+
+\section{Architecture}
+
+
+\section{Unit Testing Plan}
+
+\subsection{Sensor module}
+\subsubsection{Hokuyo}
+
+\subsubsection{UAV camera}
+
+
+\subsection{Perceptual module}
+Perceptual module 
+
+\subsection{Behavior module}
+Behavior module activates behaviors including watching, approaching and threatening when their corresponding perceptual schemas are perceived. In this section, we test if each behavior is correctly activated.
+
+\subsubsection{Watching}
+Watching behavior is always activated. Its motor schemas are fly\_at\_given\_altitude and stabilize.
+
+\begin{enumerate}[A.]
+\item No crowd
+\item Crowds are far away
+\item Crowds are within approaching distance
+\item Crowds are within threatening distance
+\end{enumerate}
+
+\subsubsection{Approaching}
+Watching behavior is activated when the nearest crowds within approaching distance from the UAV. Its motor schemas are fly\_at\_given\_altitude and follow\_x\_direction. 
+\begin{enumerate}[A.]
+\item No crowd
+\item Crowds are far away
+\item The nearest crowd is within approaching distance
+\item The nearest crowd is within threatening distance
+\end{enumerate}
+
+\subsubsection{Threatening}
+Watching behavior is activated when the nearest within threaten distance from the UAV. Its motor schema is random\_move\_3D.
+\begin{enumerate}[A.]
+\item No crowd
+\item Crowds are far away
+\item The nearest crowd is within approaching distance
+\item The nearest crowd is within threatening distance
+\end{enumerate}
+
+\subsection{Motor schemas}
+\subsubsection{fly\_at\_given\_altitude}
+\begin{enumerate}[A.]
+\item Crowds are far away
+\end{enumerate}
+
+\subsubsection{follow\_x\_direction}
+\begin{enumerate}[A.]
+\item Target is near the wall
+\end{enumerate}
+
+\subsubsection{random\_move\_3D}
+\begin{enumerate}[A.]
+\item Target is near the wall
+\end{enumerate}
+
+\subsubsection{stabilize}
+
+\subsection{Coordination module}
+Coordination module uses subsumption to coordinate multiple behaviors. The behaviors are organized vertically, where one behavior in higher layer suppresses all the behaviors that are below it. In this case, watching is in layer zero, approaching is in layer one, and threatening is in layer two. In this section, we test if the highest one among the activated behaviors is selected.
+
+\begin{enumerate}[A.]
+\item No crowd
+\item Crowds are far away
+\item The nearest crowd is within approaching distance
+\item The nearest crowd is within threatening distance
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[htb]
+\renewcommand{\arraystretch}{1.3}
+\centering
+\begin{tabular}{|p{3.1 cm}|c|c|c|c|p{3 cm}|}
+\hline
+\textbf{Crowd proximity} & \textbf{Watching} & \textbf{Approach.} & \textbf{Threaten.}   & \textbf{Overall} & \textbf{Motors}\\
+\hline
+No crowd & Y & N & N & watching &  fly\_at\_given\_altitude \newline stabilize\\
+\hline
+Far away & Y & N & N & watching &  fly\_at\_given\_altitude \newline stabilize\\
+\hline
+Within approaching \newline distance & Y & Y & N & approaching & fly\_at\_given\_altitude \newline follow\_x\_direction\\
+\hline
+Within threatening \newline distance & Y & Y & Y &  threatening & random\_move\_3D \\
+\hline
+\end{tabular}		
+\caption {} \label{behavior}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Execution module}
+
+\subsection{Crowd}
+
+\section{Integrated Testing Plan}
+
+\subsection{Parameter selection}
+
+
+
+\end{document}
