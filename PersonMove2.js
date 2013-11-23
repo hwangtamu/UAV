@@ -1,6 +1,6 @@
 //speed variables
 var speed = 0.5;
-
+var backspeed = 0.0;
 //movement variables
 var startPos = Vector3.zero;
 var trans = 0.0;
@@ -30,7 +30,7 @@ function Start(){
 	trans = rand - 0.5;
 	//determine random speed (at least 0.3 so it's not completely tedious)
 	rand = Random.value;
-	speed = rand/2+0.3;
+	speed = rand/2+0.8;
 	
 	//determine random starting position within bounding box
 	// -2 < x < 2
@@ -44,9 +44,9 @@ function Start(){
 	x_target = trans*3.0;
 	var travel_route = 	Mathf.Sqrt((x_target-startX)*(x_target-startX)+(z_target-startZ)*(z_target-startZ));
 	var t = travel_route/speed;
-	xMove = (x_target-startX)*0.03/t;
-	zMove = (z_target-startZ)*0.03/t;
-	
+	xMove = (x_target-startX)*2*Time.deltaTime/t;
+	zMove = (z_target-startZ)*2*Time.deltaTime/t;
+	backspeed = -zMove;
 }
 
 function Update () {
@@ -61,26 +61,30 @@ function Update () {
 	sqrLen = (target.position - transform.position).sqrMagnitude;
 	
 	if( sqrLen < social && !goBack){
-		zMove += -.125 * Time.deltaTime * speed;
+		zMove += -.1 * Time.deltaTime * zMove;
 	}
 	if( sqrLen < personal && !goBack){
-		zMove += -.25 * Time.deltaTime * speed;
+		zMove += -.2 * Time.deltaTime * zMove;
 	}
 	if( sqrLen < intimate || goBack){
 		//too scared = leave
 		xMove = 0.0;
-		zMove = -1.5 * Time.deltaTime * speed;
+		if(sqrLen < personal )
+			zMove = 0.2*backspeed;
 		
-		//stop at back wall
-		if(transform.position.z >= -14){
-			transform.Translate(xMove, 0, zMove);
-		}
-		
+		if(sqrLen < social )
+			zMove = 0.6*backspeed;
+			
+		if(sqrLen >=social )
+			zMove = 1.0*backspeed;
+			
+		transform.Translate(xMove, 0, zMove);
 		goBack = true;
 	}
+
 	
 	//stop at back wall
-	if(transform.position.z < 0.9){
+	if(transform.position.z <= 0){
 		transform.Translate(xMove, 0, zMove);
 	}
 	if(transform.position.z<-14 || transform.position.z>0||(Mathf.Abs(transform.position.x)>2.5 && Mathf.Abs(transform.position.z-5.5)<0.1)){
