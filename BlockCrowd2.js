@@ -76,8 +76,8 @@ function Start() {
 
 // called for each new frame Unity draws
 function Update () {
-    bodies = new Array();
-    bodies = GameObject.FindGameObjectsWithTag("Respawn");
+    	bodies = new Array();
+    	bodies = GameObject.FindGameObjectsWithTag("Respawn");
 	targets = new Array(bodies);	
 	
 	animation.CrossFade("Spin");	
