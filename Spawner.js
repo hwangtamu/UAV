@@ -105,7 +105,7 @@ function Update () {
 //Generate a huge number of crowds.
 function Insane(){
 	for(var i=0;i<1000;i++ ){
-	timer+=Time.deltaTime;
+		timer+=Time.deltaTime;
 		if(timer>1.0){
 			Spawn_Crowd();
 			timer = 0.0;
