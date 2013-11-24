@@ -36,7 +36,7 @@ function Start(){
 	trans = rand - 0.5;
 	//determine random speed (at least 0.3 so it's not completely tedious)
 	rand = Random.value;
-	speed = rand/2+0.8;
+	speed = rand/2+1.8;
 	
 	//determine random starting position within bounding box
 	// -2 < x < 1
@@ -53,8 +53,8 @@ function Start(){
 	x_target = trans*3.0;
 	var travel_route = 	Mathf.Sqrt((x_target-startX)*(x_target-startX)+(z_target-startZ)*(z_target-startZ));
 	var t = travel_route/speed;
-	xMove = (x_target-startX)*2*Time.deltaTime/t;
-	zMove = (z_target-startZ)*2*Time.deltaTime/t;
+	xMove = (x_target-startX)*Time.deltaTime/t;
+	zMove = (z_target-startZ)*Time.deltaTime/t;
 	
 	backspeed = -zMove;
 }
