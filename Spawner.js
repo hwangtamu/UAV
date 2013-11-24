@@ -30,10 +30,11 @@ function Spawn_Crowd(){
 //Game instructions
 var showText = true;
 var textArea = new Rect(0,0,Screen.width, Screen.height);
- 
+
+//display
 function OnGUI(){
     if(showText){
-    	GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space]\nSuccess:"
+    	GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode: [3]\nCheat Mode: [5]\nStop Spawning: [space]\nSuccess:"
     	+success.ToString()+"\nFail:"+fail.ToString()+"\nSuccess Rate:"+(success/(success+fail)).ToString());
     }
 }
@@ -71,6 +72,11 @@ function Update () {
     //test_1
     if (Input.GetButtonDown("Case4")){
     	test_1();
+    	timer = 0.0;
+    }
+    
+    //reset timer
+    if (Input.GetButtonDown("Case5")){
     	timer = 12.0;
     }
     timer += Time.deltaTime;
@@ -94,24 +100,21 @@ function Update () {
     	Insane();
     	timer = 8.0;
     }
-
 }
 
 //Generate a huge number of crowds.
 function Insane(){
 	for(var i=0;i<1000;i++ ){
-		timer+=Time.deltaTime;
+	timer+=Time.deltaTime;
 		if(timer>1.0){
 			Spawn_Crowd();
-		    timer = 0.0;
-		    }
+			timer = 0.0;
+		}
 	}
 }
 
-
 function test_1(){
-	spawn_position = Vector3(1,0.33,-6);
+	spawn_position = Vector3(1,0.33,-6.3);
 	var spawncrowd = Instantiate(test, spawn_position, Quaternion.identity);
-	spawncrowd.transform.Translate(0,0,0);
-	
+	spawncrowd.transform.Translate(0,0,0);	
 }
