@@ -2,12 +2,17 @@
 //Dynamically generate test dataset.
 
 var crowd :GameObject;
+var test:GameObject;
 var spawn_position;
 var timer = 0.0;
 
 //get prefab(template)
 crowd = AssetDatabase.LoadAssetAtPath("Assets/Crowd.prefab",typeof(GameObject));
+test = AssetDatabase.LoadAssetAtPath("Assets/Test.prefab",typeof(GameObject));
 
+//count
+static var success = 0;
+static var fail = 0;
 //default case
 var test_case = 0;
 //spawn crowd randomly
@@ -21,6 +26,7 @@ function Spawn_Crowd(){
 	spawncrowd.renderer.material.color = Color(Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0));
 }
 
+
 //Game instructions
 var showText = true;
 var textArea = new Rect(0,0,Screen.width, Screen.height);
@@ -31,11 +37,12 @@ function OnGUI()
     if(showText)
     {
  
-    GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space].");
+    GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space]\n");
  
     }
  
 }
+
 
 function Start () {
 
@@ -66,6 +73,11 @@ function Update () {
     	timer = 8.0;
     }
     
+    //test_1
+    if (Input.GetButtonDown("Case4")){
+    	test_1();
+    	timer = 12.0;
+    }
     timer += Time.deltaTime;
     
     //case 1
@@ -87,6 +99,7 @@ function Update () {
     	Insane();
     	timer = 8.0;
     }
+
 }
 
 //Generate a huge number of crowds.
@@ -98,4 +111,12 @@ function Insane(){
 		    timer = 0.0;
 		    }
 	}
+}
+
+
+function test_1(){
+	spawn_position = Vector3(1,0.33,-6);
+	var spawncrowd = Instantiate(test, spawn_position, Quaternion.identity);
+	spawncrowd.transform.Translate(0,0,0);
+	
 }
