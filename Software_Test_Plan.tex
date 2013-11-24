@@ -23,6 +23,12 @@
 
 \section{Architecture}
 
+\begin{figure}[htb]
+\centering
+\includegraphics[height=10cm]{figures/architecture.png}
+\caption{Architecture}
+\label{architecture}
+\end{figure}
 
 \section{Unit Testing Plan}
 
@@ -33,10 +39,10 @@
 
 
 \subsection{Perceptual module}
-Perceptual module 
+Perceptual module processes data from senor input, specially it selects the closest crowd as target.
 
 \subsection{Behavior module}
-Behavior module activates behaviors including watching, approaching and threatening when their corresponding perceptual schemas are perceived. In this section, we test if each behavior is correctly activated.
+Behavior module activates behaviors including watching, approaching and threatening when their corresponding perceptual schemas are perceived. In this section, we test if each behavior is correctly activated. To test all the cases, we generate a cylinder in different locations, and see what behaviors are triggered.
 
 \subsubsection{Watching}
 Watching behavior is always activated. Its motor schemas are fly\_at\_given\_altitude and stabilize.
@@ -111,7 +117,7 @@ Within approaching \newline distance & Y & Y & N & approaching & fly\_at\_given\
 Within threatening \newline distance & Y & Y & Y &  threatening & random\_move\_3D \\
 \hline
 \end{tabular}		
-\caption {} \label{behavior}
+\caption {Behavior module and coordination module testing.} \label{behavior}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -122,7 +128,8 @@ Within threatening \newline distance & Y & Y & Y &  threatening & random\_move\_
 \section{Integrated Testing Plan}
 
 \subsection{Parameter selection}
-
+0: 0.4, 1: 0.63, 5: 0.85, 10: 0.88, 15: 0.89. 50: 0.91, 100: 0.92, inf: 0.93
+Our guess is this is because the approaching speed of UAV is twice as much as the maximal speed of crowd. 
 
 
 \end{document}
