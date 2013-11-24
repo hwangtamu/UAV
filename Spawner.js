@@ -116,5 +116,4 @@ function Insane(){
 function test_1(){
 	spawn_position = Vector3(1,0.33,-6.3);
 	var spawncrowd = Instantiate(test, spawn_position, Quaternion.identity);
-	spawncrowd.transform.Translate(0,0,0);	
 }
