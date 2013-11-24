@@ -1,13 +1,14 @@
 // const
 var inf = 1e10;
+var robotWidth = 0.309;
 
 // guard line definition
 var ZUpperBound = -5.4;
 var ZLowerBound = -5.6;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
-var XUpperBound = 1.5;
-var XLowerBound = -1.5;
+var XUpperBound = 1.5 - robotWidth;
+var XLowerBound = -1.5 + robotWidth;
 
 // animation variables
 private var spin : AnimationState;
@@ -33,6 +34,7 @@ var goingup = false;
 var robot : Transform;
 
 // proximity variables
+var sensorRange = 6;
 var approachLine = 4;
 var threatenLine = 1;
 
@@ -108,8 +110,10 @@ function robotCamera() {
 	var newTargets = new Array ();
 	var newTargetsAboveLine = new Array ();
 	
-	for (var body in bodies) {		
-		newTargets.Push(body);		
+	for (var body in bodies) {	
+		//Debug.Log((body.transform.position - robot.transform.position).sqrMagnitude);
+		if ((body.transform.position - robot.transform.position).sqrMagnitude < sensorRange * sensorRange)
+			newTargets.Push(body);		
 	}
 	
 	targets = newTargets;	
@@ -127,7 +131,7 @@ function Perceptual_module() {
 		var tz = body.transform.position.z;
 		var mx = transform.position.x;
 		var mz = transform.position.z;
-		var currenSqrLen = (mx - tx) * (mx - tx) * 1 + (mz - tz) * (mz - tz) * 5;
+		var currenSqrLen = (mx - tx) * (mx - tx) * 0 + (mz - tz) * (mz - tz) * 1;
 		if (body.transform.position.z < guardLine && currenSqrLen < pos) {
 			pos = currenSqrLen;
 			closest = body.transform;
@@ -141,39 +145,41 @@ function Perceptual_module() {
 // there are possibly three behaviours: watching, approaching and threatening.
 function Behaviour_module() {
 
-	if (currentTarget != null)
+	if (currentTarget != null) {
 		dist = guardLine - currentTarget.transform.position.z;
+		Debug.Log("dist: " + dist);
+	}
 	else
 		Debug.Log("Target not found");
 
 	behaviours = [];
 	
-	// watching
-	if (currentTarget == null || approachLine < dist) {
-		var new_behaviour = new Behaviour(0);
-		// above eye-level
-		new_behaviour.Add_motor(fly_at_given_altitude);
-		new_behaviour.Add_motor(stabilize);	
-		new_behaviour.YUpperBound = 1.0;
-		new_behaviour.YLowerBound = 0.9;
-		new_behaviour.moveSpeed = 0.0;
-		new_behaviour.verticalSpeed = 0.01;
-		
-		behaviours.Push(new_behaviour);
-	}
+	// watching	
+	var new_behaviour = new Behaviour(0);
+	// above eye-level
+	new_behaviour.Add_motor(fly_at_given_altitude);
+	new_behaviour.Add_motor(stabilize);	
+	new_behaviour.YUpperBound = 1.0;
+	new_behaviour.YLowerBound = 0.9;
+	new_behaviour.moveSpeed = 0.0;
+	new_behaviour.verticalSpeed = 0.01;
+	
+	behaviours.Push(new_behaviour);
+	Debug.Log("watching");
 	
 	// approaching
-	if (currentTarget != null && threatenLine < dist && dist <= approachLine) {		
+	if (currentTarget != null && dist <= approachLine) {		
 		new_behaviour = new Behaviour(1);
 		// eye-level				
 		new_behaviour.Add_motor(fly_at_given_altitude);
 		new_behaviour.Add_motor(follow_x_direction);
 		new_behaviour.YUpperBound = 0.6;
 		new_behaviour.YLowerBound = 0.5;
-		new_behaviour.moveSpeed = 4.0;
+		new_behaviour.moveSpeed = 2.0;
 		new_behaviour.verticalSpeed = 0.02;
 		
 		behaviours.Push(new_behaviour);
+		Debug.Log("approaching");
 	}	
 	
 	// threatening
@@ -182,10 +188,11 @@ function Behaviour_module() {
 		new_behaviour.Add_motor(random_move_3D);
 		new_behaviour.YUpperBound = 0.4;
 		new_behaviour.YLowerBound = 0.3;
-		new_behaviour.moveSpeed = 6.0;
+		new_behaviour.moveSpeed = 4.0;
 		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
+		Debug.Log("threatening");
 	}
 }
 
@@ -203,8 +210,7 @@ function Coordination_module() {
 				highest = behaviour.level;
 			}
 		}
-	}
-	
+	}	
 }
 
 // execute the overall behaviours
@@ -245,7 +251,9 @@ function follow_x_direction() {
 
 // going up and down to be within a altitude range
 function fly_at_given_altitude() {
+
 	Debug.Log("fly_at_given_altitude");
+	
 	// above the range
 	if (transform.position.y > YUpperBound){
 		transform.Translate(0, -verticalSpeed, 0);
