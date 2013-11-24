@@ -18,11 +18,14 @@ var test_case = 0;
 //spawn crowd randomly
 function Spawn_Crowd(){
 	var rand = Random.value;
+	//random start position
 	var StartX = 3*rand;
 	var StartZ = -1*rand - 10;
 	spawn_position = Vector3(StartX,0.33,StartZ);
 	var spawncrowd = Instantiate(crowd, spawn_position, Quaternion.identity);
+	//random crowd size
 	spawncrowd.transform.localScale = new Vector3(0.1+0.4*rand,0.3,0.1+0.4*rand);
+	//random crowd color
 	spawncrowd.renderer.material.color = Color(Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0));
 }
 
@@ -81,13 +84,13 @@ function Update () {
 	}
 	timer += Time.deltaTime;
     
-	//case 1
+	//case 1 -- easy mode
 	if (timer>3 && test_case == 1){
 		Spawn_Crowd();
 		timer = 0.0;
 	}
     
-	//case 2
+	//case 2 -- haed mode
 	if (timer>7 && test_case == 2){
 		Spawn_Crowd();
 		Spawn_Crowd();
@@ -95,7 +98,7 @@ function Update () {
 		timer = 4.0;
 	}
     
-	//case 3
+	//case 3 -- impossible mode
 	if(timer>11 && test_case == 3){
 		Insane();
 		timer = 8.0;
@@ -113,6 +116,7 @@ function Insane(){
 	}
 }
 
+//function for unit test
 function test_1(){
 	spawn_position = Vector3(1,0.33,-6.3);
 	var spawncrowd = Instantiate(test, spawn_position, Quaternion.identity);
