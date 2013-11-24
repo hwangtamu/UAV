@@ -39,7 +39,7 @@ function Start(){
 	speed = rand/2+0.8;
 	
 	//determine random starting position within bounding box
-	// -2 < x < 2
+	// -2 < x < 1
 	// -11 < z < -10
 	rand = Random.value;
 	var startX = 3*rand - 2;
