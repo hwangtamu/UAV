@@ -20,7 +20,7 @@ function Spawn_Crowd(){
 	var rand = Random.value;
 	var StartX = 3*rand;
 	var StartZ = -1*rand - 10;
-    spawn_position = Vector3(StartX,0.33,StartZ);
+	spawn_position = Vector3(StartX,0.33,StartZ);
 	var spawncrowd = Instantiate(crowd, spawn_position, Quaternion.identity);
 	spawncrowd.transform.localScale = new Vector3(0.1+0.4*rand,0.3,0.1+0.4*rand);
 	spawncrowd.renderer.material.color = Color(Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0),Random.Range(0.0,1.0));
@@ -47,8 +47,8 @@ function Start () {
 function Update () {
 	//stop spawning crowds
 	if (Input.GetButtonDown("Clear")){
-    	test_case = 0;
-    	timer = 0.0;
+		test_case = 0;
+		timer = 0.0;
     }
     
     //easy mode
