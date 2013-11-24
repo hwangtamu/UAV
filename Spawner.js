@@ -49,57 +49,57 @@ function Update () {
 	if (Input.GetButtonDown("Clear")){
 		test_case = 0;
 		timer = 0.0;
-    }
+	}
     
-    //easy mode
-    if (Input.GetButtonDown("Case1")){
-    	test_case = 1;
-    	timer = 0.0;
-    }
+	//easy mode
+	if (Input.GetButtonDown("Case1")){
+		test_case = 1;
+		timer = 0.0;    
+	}
     
-    //hard mode
-    if (Input.GetButtonDown("Case2")){
-    	test_case = 2;
-    	timer = 4.0;
-    }
+	//hard mode
+	if (Input.GetButtonDown("Case2")){
+		test_case = 2;
+		timer = 4.0;
+	}
     
-    //impossible mode
-    if (Input.GetButtonDown("Case3")){
-    	test_case = 3;
-    	timer = 8.0;
-    }
+	//impossible mode
+	if (Input.GetButtonDown("Case3")){
+		test_case = 3;
+		timer = 8.0;
+	}
     
-    //test_1
-    if (Input.GetButtonDown("Case4")){
-    	test_1();
-    	timer = 0.0;
-    }
+	//test_1
+	if (Input.GetButtonDown("Case4")){
+		test_1();
+		timer = 0.0;
+	}
     
-    //reset timer
-    if (Input.GetButtonDown("Case5")){
-    	timer = 12.0;
-    }
-    timer += Time.deltaTime;
+	//reset timer
+	if (Input.GetButtonDown("Case5")){
+		timer = 12.0;
+	}
+	timer += Time.deltaTime;
     
-    //case 1
-    if (timer>3 && test_case == 1){
-    	Spawn_Crowd();
-    	timer = 0.0;
-    }
+	//case 1
+	if (timer>3 && test_case == 1){
+		Spawn_Crowd();
+		timer = 0.0;
+	}
     
-    //case 2
-    if (timer>7 && test_case == 2){
-    	Spawn_Crowd();
-    	Spawn_Crowd();
-    	Spawn_Crowd();
-    	timer = 4.0;
-    }
+	//case 2
+	if (timer>7 && test_case == 2){
+		Spawn_Crowd();
+		Spawn_Crowd();
+		Spawn_Crowd();
+		timer = 4.0;
+	}
     
-    //case 3
-    if(timer>11 && test_case == 3){
-    	Insane();
-    	timer = 8.0;
-    }
+	//case 3
+	if(timer>11 && test_case == 3){
+		Insane();
+		timer = 8.0;
+	}
 }
 
 //Generate a huge number of crowds.
