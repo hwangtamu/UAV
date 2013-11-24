@@ -19,13 +19,13 @@ var deviant_z = 0;
 var target;
 target = GameObject.Find("airrobotJ_2").transform;
 var goBack = false;
+var marked = false;
 
 //position variables
 var intimate = 0.46;
 var personal = 1.22;
 var social = 3.66;
 var sqrLen = 0.0;
-
 
 
 function Start(){
@@ -60,7 +60,7 @@ function Start(){
 }
 
 function Update () {
-
+	
 	//determines tilt-ness
 	//xMove = trans * Time.deltaTime * speed;
 	
@@ -90,6 +90,11 @@ function Update () {
 			
 		transform.Translate(xMove, 0, zMove);
 		goBack = true;
+		//a successful block
+		if(marked == false){
+			Spawn.success += 1;
+			marked = true;
+		}
 	}
 
 	
@@ -98,16 +103,26 @@ function Update () {
 		transform.Translate(xMove, 0, zMove);
 	}
 	
+	
+	
+	//robot fails if people pass the exit
+	if(transform.position.z>-3.5 && marked == false){
+		Spawn.fail += 1;
+		marked = true;
+	}
+	
+	if(transform.position.z<-14 || transform.position.z>0){
+		
+		Destroy(gameObject);
+	}
+	
 	//Destroy redundant gameobject automatically.
 	deviant_x = Mathf.Abs(transform.position.x);
 	deviant_z = Mathf.Abs(transform.position.z+5.5);
 	
-	if(deviant_x >2 && deviant_z < 0.5){
+	if(deviant_x >1.5 && deviant_z < 0.5){
 		Destroy(gameObject);
 	}
-	if(transform.position.z<-14 || transform.position.z>0){
-		Destroy(gameObject);
-	}
-	
-	
 }
+
+
