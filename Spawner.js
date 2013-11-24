@@ -11,8 +11,8 @@ crowd = AssetDatabase.LoadAssetAtPath("Assets/Crowd.prefab",typeof(GameObject));
 test = AssetDatabase.LoadAssetAtPath("Assets/Test.prefab",typeof(GameObject));
 
 //count
-static var success = 0;
-static var fail = 0;
+static var success = 0.0;
+static var fail = 0.0;
 //default case
 var test_case = 0;
 //spawn crowd randomly
@@ -31,16 +31,11 @@ function Spawn_Crowd(){
 var showText = true;
 var textArea = new Rect(0,0,Screen.width, Screen.height);
  
-function OnGUI()
-{
- 
-    if(showText)
-    {
- 
-    GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space]\n");
- 
+function OnGUI(){
+    if(showText){
+    	GUI.Label(textArea,"Controller:\nEasy Mode: [1]\nHard Mode: [2]\nImpossible Mode [3]\nStop Spawning: [space]\nSuccess:"
+    	+success.ToString()+"\nFail:"+fail.ToString()+"\nSuccess Rate:"+(success/(success+fail)).ToString());
     }
- 
 }
 
 
