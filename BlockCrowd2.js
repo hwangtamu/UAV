@@ -36,7 +36,7 @@ var robot : Transform;
 // proximity variables
 var sensorRange = 6;
 var approachLine = 4;
-var threatenLine = 1;
+var threatenLine = 1.5;
 
 // behaviour variables
 var behaviours : Array;
@@ -46,16 +46,16 @@ public class Behaviour
 {
 	public var level : int; // higher level has higher priority
 	public var motors : Array; // function pointers	
-	public var YUpperBound : float;
-	public var YLowerBound : float;
-	public var moveSpeed : float;
-	public var verticalSpeed : float;
-	
-	public function Add_motor(motor : Function) {
+	public var YUpperBound : float; // altitude upper bound
+	public var YLowerBound : float; // altitude lower bound
+	public var moveSpeed : float;	// speed along x direction
+	public var verticalSpeed : float; // speed along y direction
+	// add function pointer of motor schema
+	public function Add_motor(motor : Function) { 
 		motors.Push(motor);
 	}
-	
-	public function Behaviour(lv : int) {
+	// constructor, initialize level and arrary motor schema pointer
+	public function Behaviour(lv : int) { 
 		level = lv;
 		motors = new Array();
 	}
@@ -76,8 +76,8 @@ function Start() {
 
 // called for each new frame Unity draws
 function Update () {
-	bodies = new Array();
-	bodies = GameObject.FindGameObjectsWithTag("Respawn");
+    bodies = new Array();
+    bodies = GameObject.FindGameObjectsWithTag("Respawn");
 	targets = new Array(bodies);	
 	
 	animation.CrossFade("Spin");	
@@ -188,7 +188,7 @@ function Behaviour_module() {
 		new_behaviour.Add_motor(random_move_3D);
 		new_behaviour.YUpperBound = 0.4;
 		new_behaviour.YLowerBound = 0.3;
-		new_behaviour.moveSpeed = 4.0;
+		new_behaviour.moveSpeed = 10.0;
 		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
