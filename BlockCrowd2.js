@@ -1,14 +1,13 @@
 // const
-var inf = 1e10;
 var robotWidth = 0.309;
 
 // guard line definition
-var ZUpperBound = -5.4;
-var ZLowerBound = -5.6;
+var ZUpperBound = -5.49;
+var ZLowerBound = -5.51;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
-var XUpperBound = 1.5 - robotWidth;
-var XLowerBound = -1.5 + robotWidth;
+var XUpperBound = 3 - robotWidth;
+var XLowerBound = -3 + robotWidth;
 
 // animation variables
 private var spin : AnimationState;
@@ -62,25 +61,27 @@ public class Behaviour
 }
 
 // define animation behaviours
-function Start() {
-	var rand = Random.value;
-	//numBodies = rand*3;
-	numBodies = 3;
-	
+function Start()
+{
 	spin = animation["Spin"];
 	spin.layer = 1;
 	spin.blendMode = AnimationBlendMode.Additive;
 	spin.wrapMode = WrapMode.Loop;
 	spin.speed = 2.0;	
+	
+	Debug.Log('Start: ' + transform.position.x);
 }
 
 // called for each new frame Unity draws
-function Update () {
+function Update()
+{
+	animation.CrossFade("Spin");
+
+	// add objects from simulator
     bodies = new Array();
-    bodies = GameObject.FindGameObjectsWithTag("Respawn");
-	targets = new Array(bodies);	
-	
-	animation.CrossFade("Spin");	
+    bodies.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
+    bodies.AddRange(GameObject.FindGameObjectsWithTag("Wall"));
+    bodies.AddRange(GameObject.FindGameObjectsWithTag("Airrobot"));   
 
 	// go through five stages
 	Sensor_module();	
@@ -95,24 +96,25 @@ function Update () {
 }
 
 // get raw data from sensors
-function Sensor_module() {
-	Hokuyo();
+function Sensor_module() 
+{
 	robotCamera();
-}
-
-// get position of robot relative to Hokuyo
-function Hokuyo() {	
-	robot = transform;
+	
+	// sanity check
+	if (transform.position.z < ZLowerBound || transform.position.z > ZUpperBound) {
+		Debug.Log('Fault: ' + transform.position.z);
+	}
 }
 
 // get position of crowds from robot on-board camera relative to the robot
-function robotCamera() {
+function robotCamera() 
+{
 	var newTargets = new Array ();
 	var newTargetsAboveLine = new Array ();
 	
 	for (var body in bodies) {	
-		//Debug.Log((body.transform.position - robot.transform.position).sqrMagnitude);
-		if ((body.transform.position - robot.transform.position).sqrMagnitude < sensorRange * sensorRange)
+		//Debug.Log((body.transform.position - transform.position).sqrMagnitude);		
+		if ((body.transform.position - transform.position).sqrMagnitude < sensorRange * sensorRange)
 			newTargets.Push(body);		
 	}
 	
@@ -120,19 +122,49 @@ function robotCamera() {
 }
 
 // find the closest target
-function Perceptual_module() {
-		
+function Perceptual_module() 
+{		
 	var closest;
-	var pos = inf;
+	var pos = Mathf.Infinity;
+	XLowerBound = -Mathf.Infinity;
+	XUpperBound = Mathf.Infinity;
+	
+	var mx = transform.position.x;
+	var mz = transform.position.z;
 
 	//determine closest z-value
 	for (var body in targets) {
 		var tx = body.transform.position.x;
 		var tz = body.transform.position.z;
-		var mx = transform.position.x;
-		var mz = transform.position.z;
+
+		
+		if (ZLowerBound <= tz && tz <= ZUpperBound) {
+			if (body.transform == transform) {
+				Debug.Log('Itself');
+				continue;		
+			}
+			if (tx < mx)
+				XLowerBound = Mathf.Max(XLowerBound, tx);
+			if (tx > mx)
+				XUpperBound = Mathf.Min(XUpperBound, tx);
+		}		
+	}
+	
+	Debug.Log("XLowerBound: " + XLowerBound);
+	Debug.Log("XUpperBound: " + XUpperBound);
+	
+	XLowerBound += robotWidth;
+	XUpperBound -= robotWidth;
+	
+	for (var body in targets) {
+		tx = body.transform.position.x;
+		tz = body.transform.position.z;
+		
+		if (ZLowerBound <= tz && tz <= ZUpperBound)
+			continue;
+		
 		var currenSqrLen = (mx - tx) * (mx - tx) * 0 + (mz - tz) * (mz - tz) * 1;
-		if (body.transform.position.z < guardLine && currenSqrLen < pos) {
+		if (tz < guardLine && XLowerBound <= tx && tx <= XUpperBound && currenSqrLen < pos) {
 			pos = currenSqrLen;
 			closest = body.transform;
 		}
@@ -143,8 +175,8 @@ function Perceptual_module() {
 
 // Active behaviours when their corresponding perceptual schema is perceived. 
 // there are possibly three behaviours: watching, approaching and threatening.
-function Behaviour_module() {
-
+function Behaviour_module() 
+{
 	if (currentTarget != null) {
 		dist = guardLine - currentTarget.transform.position.z;
 		Debug.Log("dist: " + dist);
@@ -197,8 +229,8 @@ function Behaviour_module() {
 }
 
 // coordinate multiple behaviours
-function Coordination_module() {
-	
+function Coordination_module() 
+{	
 	// select the behaviour with highest level
 	if (behaviours.length > 0) {
 		var highest = behaviours[0].level;
@@ -214,7 +246,8 @@ function Coordination_module() {
 }
 
 // execute the overall behaviours
-function Execution_module() {	
+function Execution_module() 
+{	
 	YUpperBound = currentBehaviour.YUpperBound;
 	YLowerBound = currentBehaviour.YLowerBound;
 	moveSpeed = currentBehaviour.moveSpeed;
@@ -227,8 +260,8 @@ function Execution_module() {
 }
 
 // motor schemas
-function follow_x_direction() {
-
+function follow_x_direction() 
+{
 	Debug.Log("follow_x_direction");	
 		
 	//keep within follow distance (x)		
@@ -250,8 +283,8 @@ function follow_x_direction() {
 }
 
 // going up and down to be within a altitude range
-function fly_at_given_altitude() {
-
+function fly_at_given_altitude() 
+{
 	Debug.Log("fly_at_given_altitude");
 	
 	// above the range
@@ -280,8 +313,9 @@ function fly_at_given_altitude() {
 }
 
 // move randomly in three dimensions
-function random_move_3D() {
-	Debug.Log("random_move_3D");
+function random_move_3D() 
+{
+	/*Debug.Log("random_move_3D");
 	// random pick directional vector
 	var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
 	var move : Vector3;
@@ -315,11 +349,12 @@ function random_move_3D() {
 	
 	//Debug.Log("move x2: " + (dest - transform.position).x);
 				
-	transform.Translate(dest - transform.position);
+	transform.Translate(dest - transform.position);*/
 }
 
 // reset the robot's tilt and height to normal
-function stabilize() {
+function stabilize() 
+{
 	Debug.Log("stabilize");
 	transform.eulerAngles = Vector3(0, 0, 0);	
 }
