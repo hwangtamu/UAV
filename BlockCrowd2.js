@@ -2,8 +2,8 @@
 var robotWidth = 0.309;
 
 // guard line definition
-var ZUpperBound = -5.49;
-var ZLowerBound = -5.51;
+var ZUpperBound = -5.4;
+var ZLowerBound = -5.6;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
 var XUpperBound = 3 - robotWidth;
@@ -315,9 +315,24 @@ function fly_at_given_altitude()
 // move randomly in three dimensions
 function random_move_3D() 
 {
-	/*Debug.Log("random_move_3D");
+	Debug.Log("random_move_3D");
+	// random pick target point within the bound
+	var random_vector: Vector3 = Vector3(
+									Random.Range(XLowerBound, XUpperBound), 
+									Random.Range(YLowerBound, YUpperBound),
+									Random.Range(ZLowerBound, ZUpperBound));
+	// distance between target and current location								
+	var dist = 	Mathf.Sqrt((transform.position - random_vector).sqrMagnitude);
+	var moveMagnitude = Time.deltaTime * moveSpeed;
+	
+	// move to the target direction
+	if (dist < moveMagnitude)
+		transform.Translate(random_vector - transform.position);
+	else
+		transform.Translate((random_vector - transform.position) / dist * moveMagnitude);
+	
 	// random pick directional vector
-	var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
+	/*var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
 	var move : Vector3;
 	move = Time.deltaTime * moveSpeed * random_vector.normalized;
 	//Debug.Log("move x1: " + move.x);
