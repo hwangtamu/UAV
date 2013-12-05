@@ -80,10 +80,10 @@ function Update()
 	animation.CrossFade("Spin");
 
 	// add objects from simulator
-    bodies = new Array();
-    bodies.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
-    bodies.AddRange(GameObject.FindGameObjectsWithTag("Wall"));
-    bodies.AddRange(GameObject.FindGameObjectsWithTag("Airrobot"));   
+	bodies = new Array();
+	bodies.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
+	bodies.AddRange(GameObject.FindGameObjectsWithTag("Wall"));
+	bodies.AddRange(GameObject.FindGameObjectsWithTag("Airrobot"));   
 
 	// go through five stages
 	Sensor_module();	
