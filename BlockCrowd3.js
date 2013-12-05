@@ -373,7 +373,7 @@ function avoid()
 // move the robot
 function move()
 {
-	Debug.Log("movw");
+	Debug.Log("move");
 	transform.Translate(moveVector);
 }
 
