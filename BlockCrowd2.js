@@ -1,13 +1,10 @@
-// const
-var robotWidth = 0.309;
-
 // guard line definition
-var ZUpperBound = -5.4;
-var ZLowerBound = -5.6;
+var ZUpperBound = -5.49;
+var ZLowerBound = -5.51;
 var YUpperBound = 1.0;
 var YLowerBound = 0.9;
-var XUpperBound = 3 - robotWidth;
-var XLowerBound = -3 + robotWidth;
+var XUpperBound;
+var XLowerBound;
 
 // animation variables
 private var spin : AnimationState;
@@ -41,6 +38,9 @@ var threatenLine = 1.5;
 var behaviours : Array;
 var currentBehaviour : Behaviour;
 
+// UAV
+var robotWidth;
+
 public class Behaviour
 {
 	public var level : int; // higher level has higher priority
@@ -68,6 +68,7 @@ function Start()
 	spin.blendMode = AnimationBlendMode.Additive;
 	spin.wrapMode = WrapMode.Loop;
 	spin.speed = 2.0;	
+	robotWidth = transform.renderer.bounds.size.x / 2;
 	
 	Debug.Log('Start: ' + transform.position.x);
 }
@@ -132,30 +133,29 @@ function Perceptual_module()
 	var mx = transform.position.x;
 	var mz = transform.position.z;
 
-	//determine closest z-value
+	// determine x bound
 	for (var body in targets) {
 		var tx = body.transform.position.x;
 		var tz = body.transform.position.z;
-
+		var width = body.renderer.bounds.size.x / 2;
 		
+		// consider all the objects near the guard line		
 		if (ZLowerBound <= tz && tz <= ZUpperBound) {
 			if (body.transform == transform) {
 				Debug.Log('Itself');
 				continue;		
 			}
-			if (tx < mx)
-				XLowerBound = Mathf.Max(XLowerBound, tx);
-			if (tx > mx)
-				XUpperBound = Mathf.Min(XUpperBound, tx);
+			if (tx + width < mx)
+				XLowerBound = Mathf.Max(XLowerBound, tx + width);
+			if (tx - width > mx)
+				XUpperBound = Mathf.Min(XUpperBound, tx - width);
 		}		
 	}
 	
 	Debug.Log("XLowerBound: " + XLowerBound);
-	Debug.Log("XUpperBound: " + XUpperBound);
-	
-	XLowerBound += robotWidth;
-	XUpperBound -= robotWidth;
-	
+	Debug.Log("XUpperBound: " + XUpperBound);	
+
+	// determine closest target	
 	for (var body in targets) {
 		tx = body.transform.position.x;
 		tz = body.transform.position.z;
@@ -218,9 +218,9 @@ function Behaviour_module()
 	if (currentTarget != null && dist <= threatenLine) {
 		new_behaviour = new Behaviour(2);
 		new_behaviour.Add_motor(random_move_3D);
-		new_behaviour.YUpperBound = 0.4;
-		new_behaviour.YLowerBound = 0.3;
-		new_behaviour.moveSpeed = 10.0;
+		new_behaviour.YUpperBound = 0.5;
+		new_behaviour.YLowerBound = 0.2;
+		new_behaviour.moveSpeed = 6.0;
 		new_behaviour.verticalSpeed = 0.01;
 		
 		behaviours.Push(new_behaviour);
@@ -254,8 +254,7 @@ function Execution_module()
 	verticalSpeed = currentBehaviour.verticalSpeed;
 	
 	for (var motor in currentBehaviour.motors) {
-		motor();
-		//Debug.Log("motor");
+		motor();		
 	}
 }
 
@@ -273,10 +272,10 @@ function follow_x_direction()
 	if (transform.position.x < currentTarget.position.x - followDistance)
 		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
 		
-	if (dest.x > XUpperBound)
-		dest.x = dest.x - Time.deltaTime * moveSpeed;	
-	if (dest.x < XLowerBound)
-		dest.x = dest.x + Time.deltaTime * moveSpeed;
+	if (dest.x > XUpperBound - robotWidth)
+		dest.x = XUpperBound - robotWidth;	
+	if (dest.x < XLowerBound + robotWidth)
+		dest.x = XLowerBound + robotWidth;
 	
 	//Debug.Log((dest - transform.position).x);	
 	transform.Translate(dest - transform.position);
@@ -298,7 +297,7 @@ function fly_at_given_altitude()
 		goingup = true;
 	}
 	// in the range
-	if (YLowerBound <= transform.position.y && transform.position.y <= YUpperBound){
+	if (YLowerBound <= transform.position.y && transform.position.y <= YUpperBound) {
 		if(goingup){
 			transform.Translate(0, verticalSpeed, 0);
 			if(transform.position.y >= YUpperBound)
@@ -318,53 +317,23 @@ function random_move_3D()
 	Debug.Log("random_move_3D");
 	// random pick target point within the bound
 	var random_vector: Vector3 = Vector3(
-									Random.Range(XLowerBound, XUpperBound), 
+									Random.Range(XLowerBound + robotWidth, XUpperBound - robotWidth), 
 									Random.Range(YLowerBound, YUpperBound),
 									Random.Range(ZLowerBound, ZUpperBound));
+									
 	// distance between target and current location								
-	var dist = 	Mathf.Sqrt((transform.position - random_vector).sqrMagnitude);
+	var targetDist = 	Mathf.Sqrt((transform.position - random_vector).sqrMagnitude);
 	var moveMagnitude = Time.deltaTime * moveSpeed;
 	
 	// move to the target direction
-	if (dist < moveMagnitude)
+	if (targetDist < moveMagnitude) {
 		transform.Translate(random_vector - transform.position);
-	else
-		transform.Translate((random_vector - transform.position) / dist * moveMagnitude);
-	
-	// random pick directional vector
-	/*var random_vector: Vector3 = Vector3(Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0), Random.Range(-1.0, 1.0));
-	var move : Vector3;
-	move = Time.deltaTime * moveSpeed * random_vector.normalized;
-	//Debug.Log("move x1: " + move.x);
-	
-	var dest : Vector3;
-	dest = transform.position + move;	
-	
-	if (dest.z > ZUpperBound)
-		dest.z = transform.position.z - Time.deltaTime * moveSpeed;
-	if (dest.z < ZLowerBound)
-		dest.z = transform.position.z + Time.deltaTime * moveSpeed;
-		
-	if (dest.y > YUpperBound)
-		dest.y = transform.position.y - Time.deltaTime * moveSpeed;
-	if (dest.y < YLowerBound)
-		dest.y = transform.position.y + Time.deltaTime * moveSpeed;		
-	
-	// make sure the robot does not hit the wall as well
-	if (dest.x > currentTarget.position.x + followDistance)
-		dest.x = transform.position.x - Time.deltaTime * moveSpeed;	
-	if (dest.x < currentTarget.position.x - followDistance)
-		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
-	
-	// make sure the robot does not hit the wall as well	
-	if (dest.x > XUpperBound)
-		dest.x = transform.position.x - Time.deltaTime * moveSpeed;	
-	if (dest.x < XLowerBound)
-		dest.x = transform.position.x + Time.deltaTime * moveSpeed;
-	
-	//Debug.Log("move x2: " + (dest - transform.position).x);
-				
-	transform.Translate(dest - transform.position);*/
+		Debug.Log('targetDist < moveMagnitude:' + (random_vector - transform.position).y);
+	}
+	else {
+		transform.Translate((random_vector - transform.position) / targetDist * moveMagnitude);
+		Debug.Log('targetDist >= moveMagnitude:' + ((random_vector - transform.position) / dist * moveMagnitude).y);
+	}
 }
 
 // reset the robot's tilt and height to normal
